@@ -19,15 +19,15 @@ const navigation = [
   { name: "Template Cetak", href: "/dashboard/layouts", icon: LayoutTemplate },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onMobileClose }: { onMobileClose?: () => void }) {
   const pathname = usePathname();
   const { signOut, user } = useAuth();
 
   return (
       <div className="flex h-screen w-64 flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
       <div className="flex h-16 shrink-0 items-center px-6 gap-2 border-b border-gray-100 dark:border-gray-800">
-        <Receipt className="h-8 w-8 text-blue-600 dark:text-blue-500" />
-        <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <Receipt className="h-8 w-8 text-blue-600 dark:text-blue-500 shrink-0" />
+        <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
           TataNota
         </span>
       </div>
@@ -43,6 +43,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={onMobileClose}
                 className={cn(
                   isActive
                     ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-semibold"
