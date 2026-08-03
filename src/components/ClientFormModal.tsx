@@ -101,7 +101,7 @@ export function ClientFormModal({ isOpen, onClose, clientToEdit, onSuccess }: Cl
 
               <div>
                 <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL Gambar Logo (Opsional)</label>
-                <input type="url" name="logoUrl" id="logoUrl" defaultValue={clientToEdit?.logoUrl} placeholder="https://example.com/logo.png" className="block w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder-gray-400 dark:placeholder-gray-500 transition-colors" />
+                <input type="url" name="logoUrl" id="logoUrl" defaultValue={clientToEdit?.logoUrl} placeholder="https://example.com/logo.svg" className="block w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm placeholder-gray-400 dark:placeholder-gray-500 transition-colors" />
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Tempel tautan gambar langsung dari internet.</p>
               </div>
 

@@ -34,7 +34,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
     initialData?.invoiceNumber || `INV-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(Math.random() * 10000)}`
   );
   const [date, setDate] = useState(initialData?.date || new Date().toISOString().split('T')[0]);
-  const [customerName, setCustomerName] = useState(initialData?.customerName || "-");
+  const [customerName, setCustomerName] = useState(initialData?.customerName || "");
   const [customerAddress, setCustomerAddress] = useState(initialData?.customerAddress || "");
   const [notes, setNotes] = useState(initialData?.notes || "");
   const [usePpn, setUsePpn] = useState(initialData?.usePpn || false);

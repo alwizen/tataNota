@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TataNota - Invoice Generator",
   description: "Modern invoice generator for multiple clients",
+  icons: {
+    icon: "/fav.svg",
+  },
 };
 
 export default function RootLayout({
