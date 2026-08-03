@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { Users, FileText, LayoutTemplate, Activity, Eye } from "lucide-react";
+import { Users, FileText, LayoutTemplate, TrendingUp, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
-import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
@@ -14,7 +14,8 @@ export default function DashboardPage() {
   const [statsData, setStatsData] = useState({
     clients: 0,
     invoices: 0,
-    layouts: 0
+    layouts: 0,
+    totalRevenue: 0
   });
   const [recentInvoices, setRecentInvoices] = useState<any[]>([]);
   const [clientsMap, setClientsMap] = useState<Record<string, string>>({});
@@ -46,6 +47,11 @@ export default function DashboardPage() {
       const invoicesSnap = await getDocs(invoicesQ);
       const invoicesCount = invoicesSnap.docs.length;
       
+      // Calculate total revenue from all invoices
+      const totalRevenue = invoicesSnap.docs.reduce((sum, doc) => {
+        return sum + (doc.data().grandTotal || 0);
+      }, 0);
+      
       // Get recent 5 invoices
       const recent = invoicesSnap.docs.slice(0, 5).map(doc => ({ id: doc.id, ...doc.data() }));
       setRecentInvoices(recent);
@@ -58,7 +64,8 @@ export default function DashboardPage() {
       setStatsData({
         clients: clientsCount,
         invoices: invoicesCount,
-        layouts: layoutsCount
+        layouts: layoutsCount,
+        totalRevenue: totalRevenue
       });
       
     } catch (error) {
@@ -72,7 +79,7 @@ export default function DashboardPage() {
     { name: "Total Klien", value: loading ? "..." : statsData.clients.toString(), icon: Users, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/40" },
     { name: "Tagihan Dibuat", value: loading ? "..." : statsData.invoices.toString(), icon: FileText, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/40" },
     { name: "Template Cetak", value: loading ? "..." : statsData.layouts.toString(), icon: LayoutTemplate, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/40" },
-    { name: "Aktivitas Terbaru", value: "Aktif", icon: Activity, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-900/40" },
+    { name: "Total Pendapatan", value: loading ? "..." : formatCurrency(statsData.totalRevenue), icon: TrendingUp, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-900/40" },
   ];
 
   return (

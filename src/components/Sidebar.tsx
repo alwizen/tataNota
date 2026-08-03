@@ -25,11 +25,8 @@ export function Sidebar({ onMobileClose }: { onMobileClose?: () => void }) {
 
   return (
       <div className="flex h-screen w-64 flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors">
-      <div className="flex h-16 shrink-0 items-center px-6 gap-2 border-b border-gray-100 dark:border-gray-800">
-        <Receipt className="h-8 w-8 text-blue-600 dark:text-blue-500 shrink-0" />
-        <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white truncate">
-          TataNota
-        </span>
+      <div className="flex h-16 shrink-0 items-center px-4 gap-2 border-b border-gray-100 dark:border-gray-800">
+        <img src="/logo.png" alt="TataNota" className="h-80 w-80 object-contain" />
       </div>
       <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
         <nav className="mt-2 flex-1 space-y-1 px-3">

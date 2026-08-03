@@ -86,36 +86,36 @@ export default function InvoicePrintPreview() {
 
   return (
     <div className="flex flex-col h-full max-w-5xl mx-auto w-full pb-20">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div className="flex items-start gap-4 min-w-0">
           <Link 
             href="/dashboard/invoices"
-            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800 rounded-full transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800 rounded-full transition-colors flex-shrink-0"
           >
             <ArrowLeft className="w-6 h-6" />
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pratinjau Cetak</h1>
-            <div className="flex items-center gap-2 mt-1">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Pratinjau Cetak</h1>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{invoice.invoiceNumber}</p>
               <span className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></span>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{client?.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{client?.name}</p>
             </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end w-full sm:w-auto">
           <select 
             value={printConfig}
             onChange={(e) => setPrintConfig(e.target.value as any)}
-            className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 shadow-sm"
+            className="w-full sm:w-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 shadow-sm"
           >
             <option value="A4_half_page">A4 Standar (Setengah Halaman)</option>
             <option value="thermal_58mm">Resi Thermal (58mm)</option>
           </select>
           <button 
             onClick={handlePrint}
-            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30"
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/30 w-full sm:w-auto"
           >
             <Printer className="w-4 h-4" />
             Cetak Dokumen

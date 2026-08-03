@@ -36,9 +36,9 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-y-auto flex flex-col min-w-0 w-full">
           {/* Mobile Header Minimal */}
           <div className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="text-blue-600 dark:text-blue-500 font-black tracking-tight">TataNota</span>
-            </h1>
+            <div className="flex items-center gap-2">
+              {/* <img src="/logo.png" alt="TataNota" className="h-20 w-auto object-contain" /> */}
+            </div>
             <button 
               onClick={() => setIsSidebarOpen(true)}
               className="p-2 -mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

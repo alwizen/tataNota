@@ -23,9 +23,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="bg-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/30">
-            <Receipt className="w-10 h-10 text-white" />
-          </div>
+          <img src="/logo.png" alt="TataNota" className="h-48 w-auto object-contain" />
         </div>
         <h2 className="mt-6 text-center text-3xl flex justify-center tracking-tight font-extrabold text-gray-900 dark:text-white">
           Masuk ke TataNota

@@ -212,9 +212,6 @@ const DEFAULT_THERMAL_HTML = `
   <p>Tanggal : {{date}}</p>
   <p>Cust    : {{customerName}}</p>
   
-  <div class="divider">================================</div>
-  {{#if isPaid}}<div class="stamp-lunas-thermal">*** LUNAS ***</div>{{/if}}
-  
   <table class="items">
     {{items_html}}
   </table>
@@ -237,6 +234,9 @@ const DEFAULT_THERMAL_HTML = `
       <td class="right">{{grandTotal}}</td>
     </tr>
   </table>
+
+  <div class="divider">================================</div>
+  {{#if isPaid}}<div class="stamp-lunas-thermal">*** LUNAS ***</div>{{/if}}
   
   <div class="divider">================================</div>
   <div class="center">
