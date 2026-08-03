@@ -33,11 +33,13 @@ const DEFAULT_A4_HTML = `
       <p><strong>No:</strong> {{invoiceNumber}}</p>
       <p><strong>Bulan/Tgl:</strong> {{date}}</p>
     </div>
+    {{#if customerName}}
     <div class="meta-col text-right">
       <h3>Kepada:</h3>
       <p><strong>{{customerName}}</strong></p>
       <p>{{customerAddress}}</p>
     </div>
+    {{/if}}
   </div>
 
   <table class="items-table">
@@ -201,7 +203,7 @@ const DEFAULT_THERMAL_HTML = `
     {{#if logo}}
       <img src="{{logo}}" class="logo" />
     {{/if}}
-    <h2>{{clientName}}</h2>
+    <h2 class="bold">{{clientName}}</h2>
     <p>{{clientAddress}}</p>
     <p>{{clientPhone}}</p>
   </div>
@@ -210,8 +212,10 @@ const DEFAULT_THERMAL_HTML = `
   
   <p>Tagihan : {{invoiceNumber}}</p>
   <p>Tanggal : {{date}}</p>
-  <p>Cust    : {{customerName}}</p>
+  {{#if customerName}}<p>Cust    : {{customerName}}</p>{{/if}}
   
+  <div class="divider">--------------------------------</div>
+
   <table class="items">
     {{items_html}}
   </table>
@@ -235,11 +239,9 @@ const DEFAULT_THERMAL_HTML = `
     </tr>
   </table>
 
-  <div class="divider">================================</div>
   {{#if isPaid}}<div class="stamp-lunas-thermal">*** LUNAS ***</div>{{/if}}
   
-  <div class="divider">================================</div>
-  <div class="center">
+  <div class="center footer-block">
     <p>{{notes}}</p>
     <p>Terima Kasih!</p>
   </div>
@@ -260,14 +262,16 @@ const DEFAULT_THERMAL_CSS = `
 .logo { max-width: 40mm; max-height: 20mm; margin-bottom: 5px; filter: grayscale(100%); }
 h2 { margin: 5px 0; font-size: 14px; text-transform: uppercase; }
 p { margin: 2px 0; }
+.footer-block { margin-top: 20px; }
+.footer-block p { margin: 4px 0; }
 .divider { margin: 5px 0; font-size: 10px; overflow: hidden; white-space: nowrap; }
 .items { width: 100%; font-size: 12px; border-spacing: 0; }
 .items td { padding: 2px 0; vertical-align: top; }
 .right { text-align: right; }
-.totals { width: 100%; border-spacing: 0; margin-top: 5px; }
-.totals td { padding: 2px 0; }
-.bold { font-weight: bold; }
-.stamp-lunas-thermal { text-align: center; font-size: 16px; font-weight: bold; border-top: 2px dashed #000; border-bottom: 2px dashed #000; margin: 5px 0; padding: 5px 0; }
+.totals { width: 100%; border-spacing: 0; margin-top: 5px; margin-bottom: 12px; }
+    .totals td { padding: 2px 0; }
+    .bold { font-weight: bold; }
+    .stamp-lunas-thermal { text-align: center; font-size: 14px; font-weight: bold; border-top: 2px dashed #000; border-bottom: 2px dashed #000; margin: 12px 0; padding: 5px 0; }
 `;
 
 export function PrintTemplate({ invoice, client, layout, mode }: PrintTemplateProps) {
@@ -347,13 +351,24 @@ export function PrintTemplate({ invoice, client, layout, mode }: PrintTemplatePr
       clientEmail: client.email || "",
       invoiceNumber: invoice.invoiceNumber || "",
       date: invoice.date || "",
-      customerName: invoice.customerName || "-",
+      customerName: invoice.customerName || "",
       customerAddress: invoice.customerAddress || "",
       notes: invoice.notes || "",
       subtotal: formatCurrency(invoice.subtotal),
       ppnAmount: formatCurrency(invoice.ppnAmount),
       grandTotal: formatCurrency(invoice.grandTotal),
     };
+
+    const resolveCondition = (key: string) => {
+      if (key === 'logo') return !!client.logo;
+      if (key === 'usePpn') return !!invoice.usePpn;
+      if (key === 'isPaid') return invoice.status === 'paid';
+      return !!variables[key]?.toString().trim();
+    };
+
+    html = html.replace(/{{#if ([^}]+)}}([\s\S]*?){{\/if}}/g, (_match: string, key: string, content: string) =>
+      resolveCondition(key) ? content : ''
+    );
 
     Object.keys(variables).forEach(key => {
       const regex = new RegExp(`{{${key}}}`, 'g');

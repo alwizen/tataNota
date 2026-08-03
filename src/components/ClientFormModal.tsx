@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, updateDoc, doc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, getDocs, query, where, serverTimestamp } from "firebase/firestore";
 import { X, Loader2 } from "lucide-react";
 
 interface ClientFormModalProps {
@@ -16,7 +16,24 @@ interface ClientFormModalProps {
 export function ClientFormModal({ isOpen, onClose, clientToEdit, onSuccess }: ClientFormModalProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [layouts, setLayouts] = useState<any[]>([]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadLayouts = async () => {
+      try {
+        const layoutsQuery = query(collection(db, "layouts"), where("userId", "==", user.uid));
+        const snapshot = await getDocs(layoutsQuery);
+        setLayouts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (error) {
+        console.error("Error loading layouts:", error);
+      }
+    };
+
+    loadLayouts();
+  }, [user]);
   
   if (!isOpen) return null;
 
@@ -102,6 +119,17 @@ export function ClientFormModal({ isOpen, onClose, clientToEdit, onSuccess }: Cl
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email (Opsional)</label>
                   <input type="email" name="email" id="email" defaultValue={clientToEdit?.email} className="block w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors" />
                 </div>
+              </div>
+
+              <div>
+                <label htmlFor="defaultLayoutId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Template Cetak Default (Opsional)</label>
+                <select name="defaultLayoutId" id="defaultLayoutId" defaultValue={clientToEdit?.defaultLayoutId || ""} className="block w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors">
+                  <option value="">-- Gunakan Default Sistem --</option>
+                  {layouts.map(layout => (
+                    <option key={layout.id} value={layout.id}>{layout.name}</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Pilih template cetak default untuk klien ini.</p>
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ interface InvoiceItem {
   id: string;
   itemName: string;
   qty: number;
-  price: number;
+  price: number | "";
   discountType: "percentage" | "nominal";
   discountValue: number;
 }
@@ -41,7 +41,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   
   const [items, setItems] = useState<InvoiceItem[]>(
     initialData?.items || [
-      { id: Date.now().toString(), itemName: "", qty: 1, price: 0, discountType: "nominal", discountValue: 0 }
+      { id: Date.now().toString(), itemName: "", qty: 1, price: "", discountType: "nominal", discountValue: 0 }
     ]
   );
 
@@ -62,7 +62,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   };
 
   // Calculations
-  const calcItemSubtotal = (qty: number, price: number) => qty * price;
+  const calcItemSubtotal = (qty: number, price: number | "") => qty * Number(price || 0);
   const calcItemTotal = (item: InvoiceItem) => {
     const sub = calcItemSubtotal(item.qty, item.price);
     const disc = item.discountType === 'percentage' 
@@ -80,7 +80,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
       id: Date.now().toString(), 
       itemName: "", 
       qty: 1, 
-      price: 0, 
+      price: "", 
       discountType: "nominal", 
       discountValue: 0 
     }]);
@@ -93,7 +93,11 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
   };
 
   const handleItemChange = (id: string, field: keyof InvoiceItem, value: any) => {
-    setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+    const transformedValue = field === 'itemName' && typeof value === 'string'
+      ? value.toUpperCase()
+      : value;
+
+    setItems(items.map(item => item.id === id ? { ...item, [field]: transformedValue } : item));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -223,7 +227,7 @@ export function InvoiceForm({ initialData }: InvoiceFormProps) {
                     <input type="number" required min="1" value={item.qty} onChange={(e) => handleItemChange(item.id, 'qty', Number(e.target.value))} className="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" />
                   </td>
                   <td className="py-3 px-2">
-                    <input type="number" required min="0" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', Number(e.target.value))} className="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" />
+                    <input type="number" required min="0" value={item.price} onChange={(e) => handleItemChange(item.id, 'price', e.target.value === "" ? "" : Number(e.target.value))} className="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" />
                   </td>
                   <td className="py-3 px-2 flex gap-1 items-center">
                     <select value={item.discountType} onChange={(e) => handleItemChange(item.id, 'discountType', e.target.value)} className="border-gray-300 dark:border-gray-600 rounded-l-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-2 border bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white max-w-[65px] transition-colors">
