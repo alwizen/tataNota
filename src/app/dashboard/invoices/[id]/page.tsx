@@ -9,6 +9,7 @@ import { ArrowLeft, Printer, Loader2, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
 import { useReactToPrint } from "react-to-print";
 import { PrintTemplate } from "@/components/PrintTemplate";
+import { formatInvoiceToTxt } from '@/lib/utils';
 
 export default function InvoicePrintPreview() {
   const params = useParams();
@@ -119,6 +120,28 @@ export default function InvoicePrintPreview() {
           >
             <Printer className="w-4 h-4" />
             Cetak Dokumen
+          </button>
+          <button
+            onClick={() => {
+              try {
+                const txt = formatInvoiceToTxt(invoice, client, printConfig === 'thermal_58mm' ? 32 : 48);
+                const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${invoice?.invoiceNumber || invoice?.id || 'document'}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+              } catch (err) {
+                console.error('Failed to download txt', err);
+                alert('Gagal mengunduh file .txt');
+              }
+            }}
+            className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 transition-colors shadow-sm shadow-green-500/20 w-full sm:w-auto"
+          >
+            Download TXT
           </button>
         </div>
       </div>

@@ -67,7 +67,6 @@ export default function LoginPage() {
               >
                 <LogIn className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 Lanjutkan dengan Google
-                <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
