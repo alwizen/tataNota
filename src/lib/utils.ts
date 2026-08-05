@@ -17,8 +17,33 @@ export function formatInvoiceToTxt(invoice: any, client: any, lineWidth = 40) {
   const padRight = (s: string, w: number) => (s.length >= w ? s.slice(0, w) : s + ' '.repeat(w - s.length));
   const padLeft = (s: string, w: number) => (s.length >= w ? s.slice(0, w) : ' '.repeat(w - s.length) + s);
 
+  const wrapText = (text: string, w: number) => {
+    const words = text.split(/\s+/);
+    const out: string[] = [];
+    let line = '';
+    words.forEach((word) => {
+      if ((line + (line ? ' ' : '') + word).length <= w) {
+        line = line ? line + ' ' + word : word;
+      } else {
+        if (line) out.push(line);
+        if (word.length > w) {
+          // hard-break long word
+          for (let i = 0; i < word.length; i += w) {
+            out.push(word.slice(i, i + w));
+          }
+          line = '';
+        } else {
+          line = word;
+        }
+      }
+    });
+    if (line) out.push(line);
+    return out;
+  };
+
   const lines: string[] = [];
-  lines.push(client?.name || '');
+
+  if (client?.name) lines.push(client.name);
   if (client?.address) lines.push(client.address);
   if (client?.phone) lines.push(`Tel: ${client.phone}`);
   lines.push('-'.repeat(lineWidth));
@@ -28,42 +53,48 @@ export function formatInvoiceToTxt(invoice: any, client: any, lineWidth = 40) {
   if (invoice?.customerAddress) lines.push(invoice.customerAddress);
   lines.push('-'.repeat(lineWidth));
 
-  // Items header
-  const nameW = Math.max(12, Math.floor(lineWidth * 0.5));
-  const qtyW = 6;
-  const priceW = lineWidth - nameW - qtyW - 1;
-  lines.push(padRight('Item', nameW) + ' ' + padRight('Qty', qtyW) + padLeft('Harga', priceW));
-  lines.push('-'.repeat(lineWidth));
-
-  const calcItemTotal = (item: any) => {
-    const sub = (item.qty || 0) * (item.price || 0);
-    const disc = item.discountType === 'percentage'
-      ? sub * ((item.discountValue || 0) / 100)
-      : (item.discountValue || 0);
-    return Math.max(0, sub - disc);
-  };
+  // Items
+  const nameW = lineWidth; // we'll print name as wrapped block
+  const qtyPriceW = lineWidth; // qty and prices will be right-aligned on their own line
 
   (invoice.items || []).forEach((it: any) => {
-    const name = (it.itemName || it.name || '').replace(/\s+/g, ' ');
-    const line1 = padRight(name, nameW) + ' ' + padRight(String(it.qty || ''), qtyW) + padLeft(formatCurrency(calcItemTotal(it)), priceW);
-    lines.push(line1);
+    const name = (it.itemName || it.name || '').replace(/\s+/g, ' ').trim() || '-';
+    const wrapped = wrapText(name, nameW);
+    wrapped.forEach((l) => lines.push(l));
+
+    const qty = String(it.qty || '');
+    const price = formatCurrency(it.price || 0);
+    const total = formatCurrency((it.qty || 0) * (it.price || 0) - (it.discountType === 'percentage' ? ((it.qty || 0) * (it.price || 0) * (it.discountValue || 0) / 100) : (it.discountValue || 0)));
+    const summary = `${qty} x ${price} = ${total}`;
+    lines.push(padLeft(summary, qtyPriceW));
+    lines.push('');
   });
 
   lines.push('-'.repeat(lineWidth));
   if (typeof invoice.subtotal !== 'undefined') {
-    lines.push(padRight('Subtotal', lineWidth - 12) + padLeft(formatCurrency(invoice.subtotal || 0), 12));
+    lines.push(padLeft(`Subtotal: ${formatCurrency(invoice.subtotal || 0)}`, lineWidth));
   }
   if (invoice.usePpn) {
-    lines.push(padRight('PPN (11%)', lineWidth - 12) + padLeft(formatCurrency(invoice.ppnAmount || 0), 12));
+    lines.push(padLeft(`PPN (11%): ${formatCurrency(invoice.ppnAmount || 0)}`, lineWidth));
   }
-  lines.push(padRight('Total', lineWidth - 12) + padLeft(formatCurrency(invoice.grandTotal || invoice.total || 0), 12));
+  lines.push(padLeft(`Total: ${formatCurrency(invoice.grandTotal || invoice.total || 0)}`, lineWidth));
 
   lines.push('');
   if (invoice.notes) {
     lines.push('Catatan:');
-    lines.push(invoice.notes);
+    const noteLines = wrapText(invoice.notes, lineWidth);
+    noteLines.forEach((n) => lines.push(n));
+    lines.push('');
   }
-  lines.push('');
+  // Place LUNAS stamp before the farewell if invoice is paid
+  if (invoice?.status === 'paid' || invoice?.isPaid) {
+    const stamp = '*** LUNAS ***';
+    const leftPad = Math.max(0, Math.floor((lineWidth - stamp.length) / 2));
+    lines.push('');
+    lines.push(' '.repeat(leftPad) + stamp);
+    lines.push('');
+  }
+
   lines.push('Terima kasih!');
 
   return lines.join('\n');
